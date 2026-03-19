@@ -113,9 +113,11 @@ function out = forces_moments(x, delta, wind, P)
    disc = b^2 - 4*a*c;
    disc = max(disc, 0);
 
+   a = max(a,1e-6);
    Omega = (-b + sqrt(disc)) / (2*a);
    Omega = max(Omega, 1);
 
+   den = max(Omega * P.D_prop, 0.001);
    J = 2*pi*Va / (Omega * P.D_prop);
    J = max(min(J, 1), 0);
 
@@ -157,6 +159,9 @@ function out = forces_moments(x, delta, wind, P)
 
 
     out = [Force; Torque; Va; alpha; beta; w_n; w_e; w_d];
+    if any(isnan(out)) || any(isinf(out))
+        out = zeros(size(out));
+
 end
 
 
