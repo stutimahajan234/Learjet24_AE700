@@ -7,13 +7,16 @@ function drawSpacecraft(uu)
     u        = uu(4);       
     v        = uu(5);       
     w        = uu(6);       
-    phi      = uu(7);       % roll angle         
-    theta    = uu(8);       % pitch angle     
-    psi      = uu(9);       % yaw angle     
+    e0       = uu(7);       % roll angle         
+    e1       = uu(8);       % pitch angle     
+    e2       = uu(9);       % yaw angle     
     p        = uu(10);       % roll rate
     q        = uu(11);       % pitch rate     
     r        = uu(12);       % yaw rate    
-    t        = uu(13);       % time
+%   t        = uu(13);       % time
+    phi      = uu(14);
+    theta    = uu(15);
+    psi      = uu(16);
 
     % define persistent variables 
     persistent spacecraft_handle;
@@ -89,7 +92,7 @@ function XYZ=rotate(XYZ,phi,theta,psi)
           cos(psi), -sin(psi), 0;...
           sin(psi), cos(psi), 0;...
           0, 0, 1];
-  R = R_roll*R_pitch*R_yaw;
+  R = R_yaw * R_pitch * R_roll;
   % rotate vertices
   XYZ = R*XYZ;
 end
