@@ -64,12 +64,12 @@ function out = forces_moments(x, delta, wind, P)
 
    %airspeed 
    Va = sqrt(u_r^2 + v_r^2 + w_r^2);
+   Va = max(Va, 0.1);
 
    %angles
    alpha = atan2(w_r,u_r);
-   beta  = asin(v_r/Va);
+   beta = asin( max(min(v_r/Va,1),-1) );
 
-   
     %computing forces
     %gravity force in body frame
     F_g = P.mass * P.gravity * ...
@@ -114,6 +114,7 @@ function out = forces_moments(x, delta, wind, P)
    disc = max(disc, 0);
 
    Omega = (-b + sqrt(disc)) / (2*a);
+   Omega = max(Omega, 1);
 
    J = 2*pi*Va / (Omega * P.D_prop);
 
@@ -127,7 +128,7 @@ function out = forces_moments(x, delta, wind, P)
    Force = [Fx_aero + Fx_prop; Fy_aero; Fz_aero] + F_g;
 
    % Compute Moments
-   ell = qbar * P.S_wing * P.b * ...
+   ell = q_bar * P.S_wing * P.b * ...
     (P.C_ell_0 ...
     + P.C_ell_beta * beta ...
     + P.C_ell_p * (P.b/(2*Va)) * p ...
@@ -135,13 +136,13 @@ function out = forces_moments(x, delta, wind, P)
     + P.C_ell_delta_a * delta_a ...
     + P.C_ell_delta_r * delta_r);
 
-   m = qbar * P.S_wing * P.c * ...
+   m = q_bar * P.S_wing * P.c * ...
     (P.C_m_0 ...
     + P.C_m_alpha * alpha ...
     + P.C_m_q * (P.c/(2*Va)) * q ...
     + P.C_m_delta_e * delta_e);
 
-   n = qbar * P.S_wing * P.b * ...
+   n = q_bar * P.S_wing * P.b * ...
     (P.C_n_0 ...
     + P.C_n_beta * beta ...
     + P.C_n_p * (P.b/(2*Va)) * p ...
@@ -152,7 +153,7 @@ function out = forces_moments(x, delta, wind, P)
    Torque = [ell; m; n];
 
 
-    out = [Force'; Torque'; Va; alpha; beta; w_n; w_e; w_d];
+    out = [Force; Torque; Va; alpha; beta; w_n; w_e; w_d];
 end
 
 
