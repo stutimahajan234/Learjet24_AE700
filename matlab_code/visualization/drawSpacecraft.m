@@ -10,9 +10,10 @@ function drawSpacecraft(uu)
     e0       = uu(7);       % roll angle         
     e1       = uu(8);       % pitch angle     
     e2       = uu(9);       % yaw angle     
-    p        = uu(10);       % roll rate
-    q        = uu(11);       % pitch rate     
-    r        = uu(12);       % yaw rate    
+    e3       = uu(10);       % roll rate
+    p        = uu(11);       % pitch rate     
+    q        = uu(12);       % yaw rate
+    r        = uu(13);
 %   t        = uu(13);       % time
     phi      = uu(14);
     theta    = uu(15);
@@ -147,5 +148,6 @@ function [V,F,colors] = defineSpacecraftBody()
         mycyan;...   % top
         mycyan;...   % bottom
         ];
+    y=0;
 end
   
