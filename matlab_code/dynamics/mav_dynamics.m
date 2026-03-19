@@ -2,45 +2,33 @@ function [sys,x0,str,ts,simStateCompliance] = mav_dynamics(t,x,u,flag,MAV)
 
 switch flag
 
-  %%%%%%%%%%%%%%%%%%
+
   % Initialization %
-  %%%%%%%%%%%%%%%%%%
   case 0
     [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes(MAV);
 
-  %%%%%%%%%%%%%%%
+
   % Derivatives %
-  %%%%%%%%%%%%%%%
   case 1
     sys=mdlDerivatives(t,x,u,MAV);
 
-  %%%%%%%%%%
   % Update %
-  %%%%%%%%%%
   case 2
     sys=mdlUpdate(t,x,u);
 
-  %%%%%%%%%%%
   % Outputs %
-  %%%%%%%%%%%
   case 3
     sys=mdlOutputs(t,x);
 
-  %%%%%%%%%%%%%%%%%%%%%%%
   % GetTimeOfNextVarHit %
-  %%%%%%%%%%%%%%%%%%%%%%%
   case 4
     sys=mdlGetTimeOfNextVarHit(t,x,u);
 
-  %%%%%%%%%%%%%
   % Terminate %
-  %%%%%%%%%%%%%
   case 9
     sys=mdlTerminate(t,x,u);
 
-  %%%%%%%%%%%%%%%%%%%%
   % Unexpected flags %
-  %%%%%%%%%%%%%%%%%%%%
   otherwise
     DAStudio.error('Simulink:blocks:unhandledFlag', num2str(flag));
 
@@ -68,7 +56,7 @@ sizes = simsizes;
 
 sizes.NumContStates  = 13;
 sizes.NumDiscStates  = 0;
-sizes.NumOutputs     = 13;
+sizes.NumOutputs     = 16;
 sizes.NumInputs      = 6;
 sizes.DirFeedthrough = 0;
 sizes.NumSampleTimes = 1;   % at least one sample time is needed
@@ -200,8 +188,24 @@ sys = [];
 %=============================================================================
 %
 function sys=mdlOutputs(t,x)
-    y = x;
-sys = y;
+% Normalize quaternion 
+e = x(7:10);
+e = e / norm(e);
+x(7:10) = e;
+
+% Extract quaternion
+e0 = x(7); 
+e1 = x(8); 
+e2 = x(9); 
+e3 = x(10);
+
+% Convert to Euler angles
+phi = atan2(2*(e0*e1 + e2*e3), 1 - 2*(e1^2 + e2^2));
+theta = asin(2*(e0*e2 - e3*e1));
+psi = atan2(2*(e0*e3 + e1*e2), 1 - 2*(e2^2 + e3^2));
+
+% Output
+sys = [x; phi; theta; psi];
 
 % end mdlOutputs
 
