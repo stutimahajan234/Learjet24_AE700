@@ -142,21 +142,24 @@ function sys=mdlDerivatives(t,x,uu, MAV)
     vdot = p*w - r*u + fy/MAV.mass;
     
     wdot = q*u - p*v + fz/MAV.mass;
-       
+
+    e = [e0; e1; e2; e3];
+    e = e / norm(e);
+    e0 = e(1); e1 = e(2); e2 = e(3); e3 = e(4);
+
     e0dot = 0.5*(-p*e1 - q*e2 - r*e3);
     e1dot = 0.5*( p*e0 + r*e2 - q*e3);
     e2dot = 0.5*( q*e0 - r*e1 + p*e3);
     e3dot = 0.5*( r*e0 + q*e1 - p*e2);
 
-    Gamma  = MAV.Jx*MAV.Jz - MAV.Jxz^2;
-    Gamma1 = (MAV.Jxz*(MAV.Jx-MAV.Jy+MAV.Jz))/Gamma;
-    Gamma2 = (MAV.Jz*(MAV.Jz-MAV.Jy)+MAV.Jxz^2)/Gamma;
-    Gamma3 = MAV.Jz/Gamma;
-    Gamma4 = MAV.Jxz/Gamma;
-    Gamma5 = (MAV.Jz-MAV.Jx)/MAV.Jy;
-    Gamma6 = MAV.Jxz/MAV.Jy;
-    Gamma7 = ((MAV.Jx-MAV.Jy)*MAV.Jx + MAV.Jxz^2)/Gamma;
-    Gamma8 = MAV.Jx/Gamma;
+    Gamma1 = MAV.Gamma1;
+    Gamma2 = MAV.Gamma2;
+    Gamma3 = MAV.Gamma3;
+    Gamma4 = MAV.Gamma4;
+    Gamma5 = MAV.Gamma5;
+    Gamma6 = MAV.Gamma6;
+    Gamma7 = MAV.Gamma7;
+    Gamma8 = MAV.Gamma8;
 
         
     pdot = Gamma1*p*q - Gamma2*q*r + Gamma3*ell + Gamma4*n;
