@@ -64,7 +64,7 @@ function out = forces_moments(x, delta, wind, P)
 
    %airspeed 
    Va = sqrt(u_r^2 + v_r^2 + w_r^2);
-   Va = max(Va, 0.1);
+   Va = max(Va, 0.01);
 
    %angles
    alpha = atan2(w_r,u_r);
@@ -117,6 +117,7 @@ function out = forces_moments(x, delta, wind, P)
    Omega = max(Omega, 1);
 
    J = 2*pi*Va / (Omega * P.D_prop);
+   J = max(min(J, 1), 0);
 
    C_T = P.C_T2*J^2 + P.C_T1*J + P.C_T0;
 
@@ -125,7 +126,9 @@ function out = forces_moments(x, delta, wind, P)
    Fx_prop = T_prop;
 
    %Total forces 
-   Force = [Fx_aero + Fx_prop; Fy_aero; Fz_aero] + F_g;
+   Force = [Fx_aero + Fx_prop; 
+            Fy_aero; 
+            Fz_aero] + F_g;
 
    % Compute Moments
    ell = q_bar * P.S_wing * P.b * ...
