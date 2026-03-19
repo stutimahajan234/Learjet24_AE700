@@ -25,7 +25,7 @@ function drawSpacecraft(uu)
     persistent facecolors
     
     % first time function is called, initialize plot and persistent vars
-    if t==0
+    if isempty(spacecraft_handle)
         figure(1), clf
         [Vertices, Faces, facecolors] = defineSpacecraftBody;
         spacecraft_handle = drawSpacecraftBody(Vertices,Faces,facecolors,...
@@ -56,8 +56,8 @@ end
 function handle = drawSpacecraftBody(V,F,patchcolors,...
                                      pn,pe,pd,phi,theta,psi,...
                                      handle,mode)
-  V = translate(V', pn, pe, pd)';    % translate first
-  V = rotate(V', phi, theta, psi)';  % then rotate
+  V = rotate(V', phi, theta, psi)';
+  V = translate(V', pn, pe, pd)';
   % transform vertices from NED to XYZ (for matlab rendering)
   R = [...
       0, 1, 0;...
