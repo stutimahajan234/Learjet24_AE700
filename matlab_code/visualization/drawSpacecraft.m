@@ -1,5 +1,4 @@
 function drawSpacecraft(uu)
-
     % process inputs to function
     pn       = uu(1);       % inertial North position     
     pe       = uu(2);       % inertial East position
@@ -69,13 +68,18 @@ function handle = drawSpacecraftBody(V,F,patchcolors,...
   
   if isempty(handle)
   handle = patch('Vertices', V, 'Faces', F,...
-                 'FaceVertexCData',patchcolors,...
-                 'FaceColor','flat',...
-                 'EraseMode', mode);
+               'FaceVertexCData',patchcolors,...
+               'FaceColor','flat');
   else
-    set(handle,'Vertices',V,'Faces',F);
-    drawnow
-  end
+    if ishandle(handle)
+        set(handle,'Vertices',V,'Faces',F);
+    else
+        handle = patch('Vertices', V, 'Faces', F,...
+                       'FaceVertexCData',patchcolors,...
+                       'FaceColor','flat');
+    end
+    drawnow limitrate
+   end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%
