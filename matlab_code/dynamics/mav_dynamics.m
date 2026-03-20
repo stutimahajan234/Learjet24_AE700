@@ -144,7 +144,9 @@ function sys=mdlDerivatives(t,x,uu, MAV)
     wdot = q*u - p*v + fz/MAV.mass;
 
     e = [e0; e1; e2; e3];
+    if norm(e) > 0
     e = e / norm(e);
+    end
     e0 = e(1); e1 = e(2); e2 = e(3); e3 = e(4);
 
     e0dot = 0.5*(-p*e1 - q*e2 - r*e3);
