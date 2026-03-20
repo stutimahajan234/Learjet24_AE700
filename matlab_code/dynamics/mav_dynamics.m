@@ -2,7 +2,6 @@ function [sys,x0,str,ts,simStateCompliance] = mav_dynamics(t,x,u,flag,MAV)
 
 switch flag
 
-
   % Initialization %
   case 0
     [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes(MAV);
@@ -67,19 +66,19 @@ sys = simsizes(sizes);
 % initialize the initial conditions
 %
 x0  = [...
-    MAV.pn0;...
-    MAV.pe0;...
-    MAV.pd0;...
-    MAV.u0;...
-    MAV.v0;...
-    MAV.w0;...
-    MAV.e0;...
-    MAV.e1;...
-    MAV.e2;...
-    MAV.e3;...
-    MAV.p0;...
-    MAV.q0;...
-    MAV.r0;...
+    MAV.pn0;
+    MAV.pe0;
+    MAV.pd0;
+    MAV.u0;
+    MAV.v0;
+    MAV.w0;
+    MAV.e0;
+    MAV.e1;
+    MAV.e2;
+    MAV.e3;
+    MAV.p0;
+    MAV.q0;
+    MAV.r0;
     ];
 
 %
@@ -129,25 +128,25 @@ function sys=mdlDerivatives(t,x,uu, MAV)
     ell   = uu(4);
     m     = uu(5);
     n     = uu(6);
-    
+
     pndot = (e1^2 + e0^2 - e2^2 - e3^2)*u + 2*(e1*e2 - e3*e0)*v + 2*(e1*e3 + e2*e0)*w;
-    
+
     pedot = 2*(e1*e2 + e3*e0)*u + (e2^2 + e0^2 - e1^2 - e3^2)*v + 2*(e2*e3 - e1*e0)*w;
-    
+
     pddot = 2*(e1*e3 - e2*e0)*u + 2*(e2*e3 + e1*e0)*v + (e3^2 + e0^2 - e1^2 - e2^2)*w;
 
-    
-    udot = r*v - q*w + fx/MAV.mass;
-    
-    vdot = p*w - r*u + fy/MAV.mass;
-    
-    wdot = q*u - p*v + fz/MAV.mass;
+    phi   = atan2(2*(e0*e1 + e2*e3), 1 - 2*(e1^2 + e2^2));
+    theta = asin(2*(e0*e2 - e3*e1));
 
-    e = [e0; e1; e2; e3];
-    if norm(e) > 0
-    e = e / norm(e);
-    end
-    e0 = e(1); e1 = e(2); e2 = e(3); e3 = e(4);
+    g = MAV.gravity;
+
+
+    udot = r*v - q*w + fx/MAV.mass - g*sin(theta);
+
+    vdot = p*w - r*u + fy/MAV.mass + g*cos(theta)*sin(phi);
+
+    wdot = q*u - p*v + fz/MAV.mass + g*cos(theta)*cos(phi);
+
 
     e0dot = 0.5*(-p*e1 - q*e2 - r*e3);
     e1dot = 0.5*( p*e0 + r*e2 - q*e3);
@@ -163,13 +162,17 @@ function sys=mdlDerivatives(t,x,uu, MAV)
     Gamma7 = MAV.Gamma7;
     Gamma8 = MAV.Gamma8;
 
-        
+
     pdot = Gamma1*p*q - Gamma2*q*r + Gamma3*ell + Gamma4*n;
     qdot = Gamma5*p*r - Gamma6*(p^2 - r^2) + m/MAV.Jy;
     rdot = Gamma7*p*q - Gamma1*q*r + Gamma4*ell + Gamma8*n;
-        
+
 
 sys = [pndot; pedot; pddot; udot; vdot; wdot; e0dot; e1dot; e2dot; e3dot; pdot; qdot; rdot];
+sys = reshape(sys,13,1);
+if any(isnan(sys)) || any(isinf(sys)) || length(sys)~=13
+    sys = zeros(13,1);
+end
 
 % end mdlDerivatives
 
