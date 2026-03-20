@@ -6,17 +6,14 @@ function drawSpacecraft(uu)
     u        = uu(4);       
     v        = uu(5);       
     w        = uu(6);       
-    e0       = uu(7);       % roll angle         
-    e1       = uu(8);       % pitch angle     
-    e2       = uu(9);       % yaw angle     
-    e3       = uu(10);       % roll rate
-    p        = uu(11);       % pitch rate     
-    q        = uu(12);       % yaw rate
-    r        = uu(13);
-%   t        = uu(13);       % time
-    phi      = uu(14);
-    theta    = uu(15);
-    psi      = uu(16);
+    phi      = uu(7);       % roll angle         
+    theta    = uu(8);       % pitch angle     
+    psi      = uu(9);       % yaw angle     
+    p        = uu(10);       % roll rate
+    q        = uu(11);       % pitch rate     
+    r        = uu(12);       % yaw rate
+    t        = uu(13);
+
 
     % define persistent variables 
     persistent spacecraft_handle;
@@ -56,8 +53,10 @@ end
 function handle = drawSpacecraftBody(V,F,patchcolors,...
                                      pn,pe,pd,phi,theta,psi,...
                                      handle,mode)
-  V = translate(V', pn, pe, pd)';    % FIRST translate
-  V = rotate(V', phi, theta, psi)';  % THEN rotate
+
+ V = rotate(V', phi, theta, psi)';   
+ V = translate(V', pn, pe, pd)';     
+
   % transform vertices from NED to XYZ (for matlab rendering)
   R = [...
       0, 1, 0;...
