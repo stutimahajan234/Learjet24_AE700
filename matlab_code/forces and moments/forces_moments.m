@@ -25,6 +25,7 @@ function out = forces_moments(x, delta, wind, P)
     p       = x(10);
     q       = x(11);
     r       = x(12);
+       
     delta_e = delta(1);
     delta_a = delta(2);
     delta_r = delta(3);
@@ -35,6 +36,7 @@ function out = forces_moments(x, delta, wind, P)
     u_wg    = wind(4); % gust along body x-axis
     v_wg    = wind(5); % gust along body y-axis    
     w_wg    = wind(6); % gust along body z-axis
+
     
     % wind in inertial frame
     w_n = w_ns;
@@ -42,13 +44,15 @@ function out = forces_moments(x, delta, wind, P)
     w_d = w_ds;
     
     %Rotation matrix (inertial to body frame)
-    R_ib = [cos(theta)*cos(psi), cos(theta)*sin(psi), -sin(theta);
+    R_ib = [...
+        cos(theta)*cos(psi), cos(theta)*sin(psi), -sin(theta);
         sin(phi)*sin(theta)*cos(psi)-cos(phi)*sin(psi), ...
         sin(phi)*sin(theta)*sin(psi)+cos(phi)*cos(psi), ...
         sin(phi)*cos(theta);
         cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi), ...
         cos(phi)*sin(theta)*sin(psi)-sin(phi)*cos(psi), ...
         cos(phi)*cos(theta)];
+
 
 
    % steady wind in body frame
@@ -64,18 +68,19 @@ function out = forces_moments(x, delta, wind, P)
 
    %airspeed 
    Va = sqrt(u_r^2 + v_r^2 + w_r^2);
-   Va = max(Va, 0.01);
+   Va = max(Va, 1);
+ 
 
    %angles
    alpha = atan2(w_r,u_r);
-   beta = asin( max(min(v_r/Va,1),-1) );
+   beta = asin(max(min(v_r / Va, 1), -1));
 
     %computing forces
     %gravity force in body frame
     F_g = P.mass * P.gravity * ...
-         [-sin(theta);
-         sin(phi)*cos(theta);
-         cos(phi)*cos(theta)];
+        [-sin(theta);
+          sin(phi)*cos(theta);
+          cos(phi)*cos(theta)];
 
    % aerodynamic forces 
    q_bar = 0.5 * P.rho * Va^2;
@@ -115,11 +120,10 @@ function out = forces_moments(x, delta, wind, P)
 
    a = max(a,1e-6);
    Omega = (-b + sqrt(disc)) / (2*a);
-   Omega = max(Omega, 1);
+   Omega = max(Omega, 10);
 
-   den = max(Omega * P.D_prop, 0.001);
-   J = 2*pi*Va / (Omega * P.D_prop);
-   J = max(min(J, 1), 0);
+   J = 2*pi*Va / max(Omega*P.D_prop, 0.001);
+   J = max(min(J,1),0);
 
    C_T = P.C_T2*J^2 + P.C_T1*J + P.C_T0;
 
@@ -161,6 +165,8 @@ function out = forces_moments(x, delta, wind, P)
     out = [Force; Torque; Va; alpha; beta; w_n; w_e; w_d];
     if any(isnan(out)) || any(isinf(out))
         out = zeros(size(out));
+    end
+     
 
 end
 
